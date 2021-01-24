@@ -43,33 +43,18 @@ package in_the_game.dao {
             subscribed_teams: List[Team]
         }
 
-        class Organization {
-            name: str
-            description: str
-            logo: Optional[str]
-            country_code: Optional[str]
-        }
-
-        class League {
-            name: str
-            description: str
-            logo: Optional[str]
-            country_code: Optional[str]
-            organization: Organization
-        }
-
         class Team {
             name: str
             description: str
             logo: Optional[str]
             country_code: Optional[str]
-            leauges: List[League]
+            group: Optional[str]
+            organization: Optional[str]
         }
 
         class Meeting {
             description: str
             host_team: Optional[Team]
-            leauge: League
             start_time: datetime
             end_time: Optional[datetime]
             teams: List[Team]
@@ -92,9 +77,9 @@ package in_the_game.dao {
         User *-- UserProfile
         User o-- Team
 
-        Organization o-- League
-        League *-- Team
-        League *-- Meeting
+        Organization o-- Group
+        Group *-- Team
+        Group *-- Meeting
         Meeting *-- Team
 
         Meeting o-- Event

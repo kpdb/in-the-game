@@ -31,46 +31,25 @@ Table user_profiles {
   has_weekly_notifications boolean [default: false]
   has_daily_notifications boolean [default: false]
   has_live_notifications boolean [default: false]
-  notify_by_email boolean [default: false]
-  notify_by_url boolean [default: false]
+  notification_email varchar [null]
+  notification_url boolean [null]
 }
 
 // -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
-// Team's and organization data
-Table organizations {
-  id int [pk, increment]
-  name varchar
-  description varchar
-  logo varchar
-  country_code varchar(2) [null, note: "ISO 3166 compliant"]
-}
-
-Table leagues {
-  id int [pk, increment]
-  organization_id int [ref: > organizations.id]
-  name varchar
-  description varchar
-  logo varchar
-  country_code varchar(2) [null, note: "ISO 3166 compliant"]
-}
+// Team's related tables
 
 Table teams {
   id int [pk, increment]
   name varchar
   description varchar
   country_code varchar(2) [not null, note: "ISO 3166 compliant"]
-}
-
-Table team_leagues {
-  team_id int [ref: - teams.id]
-  league_id int [ref: - leagues.id]
+  group: varchar [null]
+  organization: varchar [null]
 }
 
 Table meetings {
   id int [pk, increment]
   description varchar
-  host_team_id int [ref: > teams.id]
-  league_id int [ref: > leagues.id]
   start_time timestamp
   end_time timestamp
 }
