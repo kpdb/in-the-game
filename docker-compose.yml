@@ -1,0 +1,27 @@
+version: "3.7"
+volumes:
+  in_the_game_devdb:
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: in_the_game-db-dev
+    volumes:
+      - in_the_game_devdb:/var/lib/postgres/data/
+    environment:
+      - POSTGRES_USER=inthegame
+      - POSTGRES_PASSWORD=inthegame
+      - POSTGRES_DB=inthegame_dev
+    ports:
+      - 54329:5432
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile-api.dev
+    volumes:
+      - ./:/code/
+    environment:
+      - DATABASE_URL=postgresql://inthegame:inthegame@db/inthegame_dev
+    ports:
+      - 8002:8000
+    command: poetry run uvicorn in_the_game.api:app --reload --workers 1 --host 0.0.0.0 --port 8000
