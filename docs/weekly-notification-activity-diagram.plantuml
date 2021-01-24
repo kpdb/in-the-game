@@ -1,0 +1,33 @@
+@startuml
+|#lightgreen|Scheduler|
+start
+:
+initialize weekly
+notification process
+;
+|#lightblue|WeeklyNotificationCreator|
+:
+get meetings data
+for next 7 days
+;
+:
+find active weekly
+subscriptions
+;
+:
+prepare subscription contexts
+for each notification method
+;
+split
+  |#linen|HTTPNotifier|
+  :prepare_message;
+  :send_notification;
+  kill
+split again
+  |#ivory|EmailNotifier|
+  :prepare_message;
+  :send_notification;
+  detach
+end split
+
+@enduml

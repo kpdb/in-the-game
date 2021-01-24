@@ -1,0 +1,104 @@
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+//
+//        .----.      .--------'                    .-.                    
+//          /   `    (_)   /    /            .--.`-'                       
+//         /.  .-.        /    /-.   .-.    /  (_;  .-.  .  .-. .-.   .-.  
+//        /  )/   )      /    /   |./.-'_  /       (  |   )/   )   )./.-'_ 
+//       /  '/   (    .-/.__.'    |(__.'  (     --;-`-'-''/   /   ( (__.'  
+//  .---------'   `- (_/  `-               `.___.'                 `-'     
+//
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+// Diagram URL: https://dbdiagram.io/d/600c58b180d742080a3790ec
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+// User data
+Table users as U {
+  id long [pk, increment] // auto-increment
+  email varchar
+  password varchar
+  created_at timestamp
+  modified_at timestamp
+}
+
+Table user_profiles {
+  id long [pk, increment]
+  user_id long [ref: - users.id]
+  is_active boolean [default: false]
+  firstname varchar
+  lastname varchar
+  country_code varchar(2) [not null, note: "ISO 3166 compliant"]
+  has_weekly_notifications boolean [default: false]
+  has_daily_notifications boolean [default: false]
+  has_live_notifications boolean [default: false]
+  notify_by_email boolean [default: false]
+  notify_by_url boolean [default: false]
+}
+
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+// Team's and organization data
+Table organizations {
+  id int [pk, increment]
+  name varchar
+  description varchar
+  logo varchar
+  country_code varchar(2) [null, note: "ISO 3166 compliant"]
+}
+
+Table leagues {
+  id int [pk, increment]
+  organization_id int [ref: > organizations.id]
+  name varchar
+  description varchar
+  logo varchar
+  country_code varchar(2) [null, note: "ISO 3166 compliant"]
+}
+
+Table teams {
+  id int [pk, increment]
+  name varchar
+  description varchar
+  country_code varchar(2) [not null, note: "ISO 3166 compliant"]
+}
+
+Table team_leagues {
+  team_id int [ref: - teams.id]
+  league_id int [ref: - leagues.id]
+}
+
+Table meetings {
+  id int [pk, increment]
+  description varchar
+  host_team_id int [ref: > teams.id]
+  league_id int [ref: > leagues.id]
+  start_time timestamp
+  end_time timestamp
+}
+
+Table team_meetings {
+  team_id int [ref: - teams.id]
+  meeting_id int [ref: - meetings.id]
+}
+
+Enum event_type {
+  meeting_start
+  meeting_end
+  score_change
+}
+
+Table events {
+  id long [pk, increment]
+  description varchar
+  occured_at timestamp
+  type event_type
+  meeting_id int [ref: > meetings.id]
+}
+
+
+// -*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.-*-.
+// Subscriptions to team related notifications
+
+Table subscribed_teams {
+  user_profile_id long [ref: - subscriptions.id]
+  team_id int [ref: - teams.id]
+}

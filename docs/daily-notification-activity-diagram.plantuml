@@ -1,0 +1,33 @@
+@startuml
+|#lightgreen|Scheduler|
+start
+:
+initialize daily
+notification process
+;
+|#lightblue|WeeklyNotificationCreator|
+:
+get meetings data
+for current day
+;
+:
+find active daily
+subscriptions
+;
+:
+prepare subscription contexts
+for each notification method
+;
+split
+  |#linen|HTTPNotifier|
+  :prepare_message;
+  :send_notification;
+  kill
+split again
+  |#ivory|EmailNotifier|
+  :prepare_message;
+  :send_notification;
+  detach
+end split
+
+@enduml

@@ -1,0 +1,194 @@
+@startuml in-the-game
+
+package in_the_game.dao {
+
+    class UserService {}
+
+    class UserProfileService {
+        get_by_email()
+        subscribe_teams_for_notification(List[Team])
+        change_notification_frequency(weekly, daily, live)
+        change_notification_method(email, url)
+    }
+
+    class TeamService {
+        create_team()
+        update_team()
+        delete_team()
+        create_meeting()
+        update_meeting()
+        delete_meeting()
+        create_meeting_event()
+        update_meeting_event()
+        delete_meeting_event()
+    }
+
+    package in_the_game.model {
+        class User {
+            email: str
+            password: str
+        }
+
+        class UserProfile {
+            user: User
+            firstname: str
+            lastname: str
+            country_code: CountryCode
+            has_weekly_notifications: bool
+            has_daily_notifications: bool
+            has_live_notifications: bool
+            notification_email: Optional[str]
+            notification_url: Optional[str]
+            is_active: bool
+            subscribed_teams: List[Team]
+        }
+
+        class Organization {
+            name: str
+            description: str
+            logo: Optional[str]
+            country_code: Optional[str]
+        }
+
+        class League {
+            name: str
+            description: str
+            logo: Optional[str]
+            country_code: Optional[str]
+            organization: Organization
+        }
+
+        class Team {
+            name: str
+            description: str
+            logo: Optional[str]
+            country_code: Optional[str]
+            leauges: List[League]
+        }
+
+        class Meeting {
+            description: str
+            host_team: Optional[Team]
+            leauge: League
+            start_time: datetime
+            end_time: Optional[datetime]
+            teams: List[Team]
+            events: List[Event]
+        }
+
+        enum EventType {
+            meeting_start
+            meeting_end
+            score_change
+        }
+
+        class Event {
+            description: str
+            type: EventType
+            meeting: Meeting
+            occured_at: datetime
+        }
+
+        User *-- UserProfile
+        User o-- Team
+
+        Organization o-- League
+        League *-- Team
+        League *-- Meeting
+        Meeting *-- Team
+
+        Meeting o-- Event
+        Event *-- EventType
+    }
+
+    UserProfileService --> UserProfile
+    UserProfileService --> Team
+    TeamService --> Team
+    UserService --> User
+}
+
+package in_the_game.api {
+    class UserController {
+        register()
+        login()
+    }
+
+    class TeamController {
+        get_all()
+        get_by_id()
+        create()
+        update()
+        delete()
+    }
+
+    class UserSubscriptionController {
+        get_subscription()
+        update_subscription()
+    }
+
+    package in_the_game.api.schema {
+        class RegistrationRequestSchema {}
+        class LoginRequestSchema {}
+        class UserProfileSchema {}
+        class TeamSchema {}
+        class MeetingSchema {}
+        class MeetingEventSchema {}
+
+        UserProfileSchema --> TeamSchema
+
+        TeamSchema o-- MeetingSchema
+        MeetingSchema o-- MeetingEventSchema
+    }
+}
+
+package in_the_game.worker {
+    class Scheduler {}
+
+    package in_the_game.worker.notifications {
+        class PeriodicNotificationCreator {}
+        class LiveNotificationCreator {}
+
+        abstract Notifier {
+            prepare_notification()
+            send_notification()
+        }
+        class HTTPNotifier {}
+        class EmailNotifier {}
+    }
+
+    package in_the_game.worker.gatherers {
+        abstract MeetingsDataGatherer {}
+        class RapidApiDataFetcher {}
+        class EurosportDotComCrawler {}
+        class EkstraklasaS3FileFetcher {}
+
+        abstract LiveEventsDataGatherer {}
+        class UnrealLiveEventsFetcher {}
+        class BundesligaLiveEventsCrawler {}
+    }
+
+    Scheduler ..> PeriodicNotificationCreator
+    PeriodicNotificationCreator ..> HTTPNotifier
+    PeriodicNotificationCreator ..> EmailNotifier
+
+    LiveEventsDataGatherer ..> LiveNotificationCreator
+    LiveNotificationCreator ..> HTTPNotifier
+    LiveNotificationCreator ..> EmailNotifier
+
+    Notifier <|-- HTTPNotifier
+    Notifier <|-- EmailNotifier
+
+    LiveEventsDataGatherer <|-- UnrealLiveEventsFetcher
+    LiveEventsDataGatherer <|-- BundesligaLiveEventsCrawler
+
+    MeetingsDataGatherer <|-- RapidApiDataFetcher
+    MeetingsDataGatherer <|-- EurosportDotComCrawler
+    MeetingsDataGatherer <|-- EkstraklasaS3FileFetcher
+}
+
+in_the_game.api --> in_the_game.dao
+in_the_game.worker --> in_the_game.dao
+
+
+
+@enduml
