@@ -1,15 +1,16 @@
-from in_the_game.db import metadata
 from sqlalchemy import (
     BigInteger,
     Column,
-    Enum,
     DateTime,
+    Enum,
     ForeignKey,
     Integer,
     String,
     Table,
     UniqueConstraint,
 )
+
+from in_the_game.db import metadata
 from in_the_game.teams.models import EventType
 
 teams = Table(
