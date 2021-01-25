@@ -22,6 +22,8 @@ services:
       - ./:/code/
     environment:
       - DATABASE_URL=postgresql://inthegame:inthegame@db/inthegame_dev
+      - JWT_SECRET=very_very_secret
+      - JWT_ALGORITH=HS256
     ports:
       - 8002:8000
     command: poetry run uvicorn in_the_game.api:app --reload --workers 1 --host 0.0.0.0 --port 8000

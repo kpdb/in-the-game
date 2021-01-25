@@ -1,18 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from in_the_game import healthcheck, teams
+
+from in_the_game import auth, healthcheck, teams, users
 from in_the_game.db import database
 
 ORIGINS = [
     "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:8002",
-    "http://localhost:5000",
 ]
 
 app = FastAPI()
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(healthcheck.router, prefix="/health", tags=["health"])
 app.include_router(teams.router, prefix="/teams", tags=["teams"])
+app.include_router(users.router, prefix="/users", tags=["users"])
 
 app.add_middleware(
     CORSMiddleware,

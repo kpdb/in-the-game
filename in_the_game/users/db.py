@@ -6,7 +6,9 @@ from sqlalchemy import (
     Integer,
     String,
     Table,
+    UniqueConstraint,
 )
+
 from in_the_game.db import metadata
 
 user_profiles = Table(
@@ -23,4 +25,12 @@ user_profiles = Table(
     Column("has_live_notifications", Boolean, default=False),
     Column("notification_email", String, nullable=True),
     Column("notification_url", String, nullable=True),
+)
+
+subscribed_teams = Table(
+    "subscribed_teams",
+    metadata,
+    Column("user_profile_id", BigInteger, ForeignKey("user_profiles.id")),
+    Column("team_id", Integer, ForeignKey("teams.id")),
+    UniqueConstraint("user_profile_id", "team_id", name="unique_user_subscriptions"),
 )

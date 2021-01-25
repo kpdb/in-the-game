@@ -1,18 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
+
+from . import service
+from .models import Profile
 
 router = APIRouter()
 
 
-@router.post("/auth")
-async def authorize_user():
-    pass
+@router.get("/{user_id}/profile", response_model=Profile)
+async def get_user_profile(user_id: int):
+    return await service.get_user_profile(user_id)
 
 
-@router.get("/subscription")
-async def get_user_subscription(user_id: int):
-    pass
-
-
-@router.put("/subscription")
-async def update_user_subscription(user_id: int, subscription):
+@router.put("/{user_id}/profile")
+async def update_user_profile(user_id: int, profile: dict = Body(...)):
     pass
