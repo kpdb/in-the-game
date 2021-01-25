@@ -54,7 +54,6 @@ package in_the_game.dao {
 
         class Meeting {
             description: str
-            host_team: Optional[Team]
             start_time: datetime
             end_time: Optional[datetime]
             teams: List[Team]
@@ -99,11 +98,7 @@ package in_the_game.api {
     }
 
     class TeamController {
-        get_all()
-        get_by_id()
-        create()
-        update()
-        delete()
+        get_all_teams()
     }
 
     class UserSubscriptionController {
