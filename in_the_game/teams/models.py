@@ -1,3 +1,4 @@
+import enum
 from datetime import datetime
 from typing import List, Optional
 
@@ -29,3 +30,23 @@ class NewMeeting(MeetingBase):
 class Meeting(MeetingBase):
     id: int
     teams: List[Team]
+
+
+class EventType(str, enum.Enum):
+    MEETING_START = 'meeting_start'
+    MEETING_END = 'meeting_end'
+    SCORE_CHANGE = 'score_change'
+
+
+class MeetingEventBase(BaseModel):
+    description: Optional[str]
+    occured_at: datetime = Field(default_factory=datetime.now)
+    type: EventType
+
+
+class NewMeetingEvent(MeetingEventBase):
+    meeting_id: int
+
+
+class MeetingEvent(MeetingEventBase):
+    id: int

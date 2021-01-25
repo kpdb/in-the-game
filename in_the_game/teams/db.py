@@ -1,7 +1,16 @@
-from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey, UniqueConstraint
-
 from in_the_game.db import metadata
-
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    Enum,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Table,
+    UniqueConstraint,
+)
+from in_the_game.teams.models import EventType
 
 teams = Table(
     "teams",
@@ -29,4 +38,14 @@ team_meetings = Table(
     Column("team_id", Integer, ForeignKey("teams.id"), nullable=False),
     Column("meeting_id", Integer, ForeignKey("meetings.id"), nullable=False),
     UniqueConstraint("team_id", "meeting_id", name="unique_team_meeting")
+)
+
+meeting_events = Table(
+    "meeting_events",
+    metadata,
+    Column("id", BigInteger, primary_key=True),
+    Column("description", String),
+    Column("occured_at", DateTime),
+    Column("type", Enum(EventType)),
+    Column("meeting_id", Integer, ForeignKey("meetings.id")),
 )
