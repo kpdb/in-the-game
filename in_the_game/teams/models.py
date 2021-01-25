@@ -17,21 +17,6 @@ class Team(NewTeam):
     id: int
 
 
-class MeetingBase(BaseModel):
-    description: str
-    start_time: datetime = Field(default_factory=datetime.now)
-    end_time: datetime = Field(default=None)
-
-
-class NewMeeting(MeetingBase):
-    team_ids: List[int]
-
-
-class Meeting(MeetingBase):
-    id: int
-    teams: List[Team]
-
-
 class EventType(str, enum.Enum):
     MEETING_START = 'meeting_start'
     MEETING_END = 'meeting_end'
@@ -50,3 +35,19 @@ class NewMeetingEvent(MeetingEventBase):
 
 class MeetingEvent(MeetingEventBase):
     id: int
+
+
+class MeetingBase(BaseModel):
+    description: str
+    start_time: datetime = Field(default_factory=datetime.now)
+    end_time: datetime = Field(default=None)
+
+
+class NewMeeting(MeetingBase):
+    team_ids: List[int]
+
+
+class Meeting(MeetingBase):
+    id: int
+    teams: List[Team]
+    events: List[MeetingEvent]

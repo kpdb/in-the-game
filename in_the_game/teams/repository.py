@@ -1,8 +1,8 @@
 
 from typing import List
 from in_the_game.db import database
-from in_the_game.teams.models import NewTeam, NewMeeting
-from in_the_game.teams.db import teams, meetings, team_meetings
+from in_the_game.teams.models import NewTeam, NewMeeting, NewMeetingEvent
+from in_the_game.teams.db import teams, meetings, team_meetings, meeting_events
 
 
 async def create_team(payload: NewTeam):
@@ -36,6 +36,40 @@ async def create_meeting(payload: NewMeeting):
     return await database.execute(query=query)
 
 
+async def get_meeting(meeting_id: int):
+    query = meetings.select().where(meetings.c.id == meeting_id)
+    return await database.fetch_one(query=query)
+
+
 async def assign_team_to_meeting(meeting_id: int, team_id: int):
     query = team_meetings.insert(meeting_id=meeting_id, team_id=team_id)
     return await database.execute(query=query)
+
+
+async def get_meeting_teams(meeting_id: int):
+    query = teams.select().select_from(
+        teams.join(team_meetings, team_meetings.c.meeting_id == meeting_id)
+    )
+    return await database.execute(query=query)
+
+
+async def get_team_meetings(team_id: int):
+    query = meetings.select().select_from(
+        meetings.join(team_meetings, team_meetings.c.team_id == team_id)
+    )
+    return await database.execute(query=query)
+
+
+async def create_meeting_event(payload: NewMeetingEvent):
+    query = meeting_events.insert(
+        type=payload.type,
+        description=payload.description,
+        occured_at=payload.occured_at,
+        meeting_id=payload.meeting_id,
+    )
+    return await database.execute(query=query)
+
+
+async def get_meeting_events(meeting_id: int):
+    query = meeting_events.select().where(meeting_events.c.meeting_id == meeting_id)
+    return await database.fetch_all(query=query)
