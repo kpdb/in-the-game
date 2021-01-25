@@ -1,4 +1,4 @@
-
+from datetime import datetime
 from typing import List
 from in_the_game.db import database
 from in_the_game.teams.models import NewTeam, NewMeeting, NewMeetingEvent
@@ -58,6 +58,11 @@ async def get_team_meetings(team_id: int):
         meetings.join(team_meetings, team_meetings.c.team_id == team_id)
     )
     return await database.execute(query=query)
+
+
+async def get_meetings_starting_between(min_date: datetime, max_date: datetime):
+    query = meetings.select().where(meetings.c.start_time.between(min_date, max_date))
+    return await database.fetch_all(query=query)
 
 
 async def create_meeting_event(payload: NewMeetingEvent):

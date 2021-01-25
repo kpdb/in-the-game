@@ -4,7 +4,6 @@ volumes:
 services:
   db:
     image: postgres:13-alpine
-    container_name: in_the_game-db-dev
     volumes:
       - in_the_game_devdb:/var/lib/postgres/data/
     environment:
@@ -27,3 +26,20 @@ services:
     ports:
       - 8002:8000
     command: poetry run uvicorn in_the_game.api:app --reload --workers 1 --host 0.0.0.0 --port 8000
+
+  broker:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+  worker:
+    build:
+      context: ./
+      dockerfile: Dockerfile-api.dev
+    volumes:
+      - ./:/code/
+    environment:
+      - DATABASE_URL=postgresql://inthegame:inthegame@db/inthegame_dev
+      - REDIS_HOST=broker
+      - REDIS_PORT=6379
+    command: poetry run arq in_the_game.worker.WorkerSettings --watch /code/in_the_game

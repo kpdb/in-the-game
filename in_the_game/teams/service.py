@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from .models import NewTeam, Team, NewMeeting, Meeting, NewMeetingEvent, MeetingEvent
 from . import repository
@@ -19,6 +20,11 @@ async def get_all_teams() -> List[Team]:
         Team(**team_data)
         for team_data in result
     ]
+
+
+async def get_meetings_starting_between(min_time: datetime, max_time: datetime):
+    meetings = await repository.get_meeting_starting_between(min_time, max_time)
+    return [Meeting(**meeting_data) for meeting_data in meetings]
 
 
 async def create_meeting(new_meeting: NewMeeting) -> Meeting:

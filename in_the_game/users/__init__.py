@@ -11,6 +11,6 @@ async def get_user_profile(user_id: int):
     return await service.get_user_profile(user_id)
 
 
-@router.put("/{user_id}/profile")
-async def update_user_profile(user_id: int, profile: dict = Body(...)):
-    pass
+@router.put("/{user_id}/profile", response_model=Profile)
+async def update_user_profile(user_id: int, profile: Profile = Body(...)):
+    return await service.update_user_profile(user_id, profile)
